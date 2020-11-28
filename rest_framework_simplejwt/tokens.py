@@ -31,15 +31,13 @@ class Token:
 
         self.token = token
         self.current_time = aware_utcnow()
+        self.token_backend = self.get_token_backend()
 
         # Set up token
         if token is not None:
-            # An encoded token was provided
-            from .state import token_backend
-
             # Decode token
             try:
-                self.payload = token_backend.decode(token, verify=verify)
+                self.payload = self.token_backend.decode(token, verify=verify)
             except TokenBackendError:
                 raise TokenError(_('Token is invalid or expired'))
 
@@ -77,9 +75,8 @@ class Token:
         """
         Signs and returns a token as a base64 encoded string.
         """
-        from .state import token_backend
 
-        return token_backend.encode(self.payload)
+        return self.token_backend.encode(self.payload)
 
     def verify(self):
         """
@@ -166,6 +163,11 @@ class Token:
         token[api_settings.USER_ID_CLAIM] = user_id
 
         return token
+
+    def get_token_backend(self):
+        from .backends import TokenBackend
+        return TokenBackend(api_settings.ALGORITHM, api_settings.SIGNING_KEY,
+                     api_settings.VERIFYING_KEY, api_settings.AUDIENCE, api_settings.ISSUER)
 
 
 class BlacklistMixin:
