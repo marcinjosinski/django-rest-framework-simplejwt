@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
+from .backends import TokenBackend
 from .exceptions import TokenBackendError, TokenError
 from .settings import api_settings
 from .token_blacklist.models import BlacklistedToken, OutstandingToken
@@ -165,7 +166,6 @@ class Token:
         return token
 
     def get_token_backend(self):
-        from .backends import TokenBackend
         return TokenBackend(api_settings.ALGORITHM, api_settings.SIGNING_KEY,
                      api_settings.VERIFYING_KEY, api_settings.AUDIENCE, api_settings.ISSUER)
 

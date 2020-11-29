@@ -20,20 +20,13 @@ class TokenBackend:
         self._validate_algorithm(algorithm)
 
         self.algorithm = algorithm
-        self.verifying_key = verifying_key
         self.signing_key = signing_key
         self.audience = audience
         self.issuer = issuer
-
-    @property
-    def signing_key(self):
-        return self._signing_key
-
-    @signing_key.setter
-    def signing_key(self, value):
-        if self.algorithm.startswith('HS'):
-            self.verifying_key = self.signing_key
-        self._signing_key = value
+        if algorithm.startswith('HS'):
+            self.verifying_key = signing_key
+        else:
+            self.verifying_key = verifying_key
 
     def _validate_algorithm(self, algorithm):
         """
